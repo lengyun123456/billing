@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="billingContrast" class="com.funguide.billing.timer.BillingContrast"></bean>
+	<bean id="billingFormat" class="com.funguide.billing.timer.BillingFormat"></bean>
+
+	<bean id="startQuertz" autowire="no"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="startupDelay" value="60"/>
+		<property name="triggers">
+			<list>
+				<ref bean="billingContrastTrigger" />
+				<ref bean="billingFormatTrigger" />
+			</list>
+		</property>
+
+	</bean>
+	<bean id="billingContrastTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<bean
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="billingContrast" />
+				</property>
+				<property name="targetMethod">
+					<value>exe</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>59 59 23 * * ?</value>
+		</property>
+	</bean>
+	<bean id="billingFormatTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<bean
+				class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="billingFormat" />
+				</property>
+				<property name="targetMethod">
+					<value>exe</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>00 30 22 * * ?</value>
+		</property>
+	</bean>
+</beans>
